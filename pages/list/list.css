@@ -1,0 +1,21 @@
+.page-list{
+}
+
+.page-list .list-wrap{
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 0;
+}
+
+.page-list .item{
+    border-bottom: 1px solid gainsboro;
+    padding: 10px;
+}
+
+.page-list .item a{
+
+}
+
+.page-list input{
+    border: 1px solid gainsboro;
+}
