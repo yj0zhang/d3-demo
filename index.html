@@ -40,13 +40,13 @@ text.axis-label {
 <script>
 				var margin = {
 					left: 70,
-                    bottom: 30,
-                    right: 50,
-                    top: 20
+                    bottom: 40,
+                    right: 60,
+                    top: 30
 				};
 				var width = 400, height, rectStep = 44, rectWidth = 22;
 				var yValue = ["浏览人数", "投递数", "查看数", "未查看", "初筛数", "面试数", "不合适", "入职数"];
-                var xValue = [9000000, 800, 77, 10, 66, 33, 26, 2];
+                var xValue = [90, 80, 77, 10, 66, 33, 26, 2];
                 var barLength = yValue.length;
                 height = rectStep * barLength + margin.top + margin.bottom;
                 function getBarWidth(d) {
@@ -81,26 +81,22 @@ text.axis-label {
 				svg.append("g")
 					.attr("class", "bar-graph__x-axis")
 					.attr("transform", "translate(" + margin.left + "," + (height - margin.bottom)+ ")")
-					.call(xAxis);
+					.call(xAxis)
+                    .selectAll("text")
+                    .attr("dy", "1em")
+                    .attr("x", "9");
+                svg.selectAll(".bar-graph__x-axis line")
+                    .attr("y2", height - margin.bottom - margin.top + "")
+                    .attr("transform", "translate(0, " + ((margin.bottom + margin.top) - height) + ")")
+                    .attr("class", "dash-grid")
 				svg.append("g")
 					.attr("class", "bar-graph__y-axis")
 					.attr("transform", "translate(" + margin.left + ",0)")
                     .call(yAxis);
-                //网格
-                var padding = 40;
-                var originX = margin.left, originY = margin.top, 
-                    endX = width - margin.right, endY = height - margin.bottom, n;
-                for( n = originX + padding; n < endX; n = n + padding) {
-                    svg.append("path")
-                        .attr("d", "M" + n + "," + originY + " L" + n + ", " + endY + " Z")
-                        .attr("class", "dash-grid")
-                }
-                
-                for( n = originY + padding; n < endY; n = n + padding) {
-                    svg.append("path")
-                        .attr("d", "M" + originX + "," + n + " L" + endX + ", " + n + " Z")
-                        .attr("class", "dash-grid")
-                }
+                // svg.selectAll(".bar-graph__y-axis line")
+                //     .attr("x2", width - margin.left - margin.right + "")
+                //     .attr("class", "dash-grid")
+                    
                 var bars = svg.selectAll("bar")
                     .data(xValue)
                     .enter()  //获取enter部分

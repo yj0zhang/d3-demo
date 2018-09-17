@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+svg {
+    border: 1px solid;
+    color: #4b525c;
+    font-size: 14px;
+}
+rect {
+    fill: #66A4F9;
+}
+text.axis-label {
+    fill: #66A4F9;
+    transform: translateY(5px);
+}
+.bar-graph__y-axis path {
+    stroke: #d5d5d5;
+    stroke-dasharray: 3;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+    fill: none;
+}
+.dash-grid {
+    stroke: #d5d5d5;
+    stroke-dasharray: 3;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+
+.dash-grid:hover {
+    stroke: #4B525C;
+    stroke-dasharray: 0;
+}
+.bar-graph__x-axis text {
+    /* transform: rotate(30deg) */
+}
+.bar-graph__x-axis path {
+    fill: #4b525c;
+}
+.bar-graph__x-axis line {
+    fill: none;
+}
+.bar-graph__y-axis line {
+    fill: none;
+}
+path {
+    fill: none;
+}
+.line-recom-compared {
+    stroke: #FFDC88;
+    stroke-width: 2;
+    stroke-dasharray: 5;
+}
+.line-recom {
+    stroke: #FFD060;
+    stroke-width: 2;
+}
+.line-forward-compared {
+    stroke: #D5F7EF;
+    stroke-width: 2;
+    stroke-dasharray: 5;
+}
+.line-forward {
+    stroke: #2CD6B1;
+    stroke-width: 2;
+}
+.line-total-compared {
+    stroke: #E1EDFE;
+    stroke-width: 2;
+    stroke-dasharray: 5;
+}
+.line-total {
+    stroke: #66A4F9;
+    stroke-width: 2;
+}
+circle {
+    fill: #fff;
+    stroke-width: 2;
+}
+circle.total {
+    stroke: #66A4F9;
+}
+circle.total:hover {
+    fill: #66A4F9;
+}
+circle.total-compared {
+    stroke: #E1EDFE;
+}
+circle.total-compared:hover {
+    fill: #E1EDFE;
+}
+circle.forward {
+    stroke: #2CD6B1;
+}
+circle.forward:hover {
+    fill: #2CD6B1;
+    transition: .2s linear;
+}
+circle.forward-compared {
+    stroke: #D5F7EF;
+}
+circle.forward-compared:hover {
+    fill: #D5F7EF;
+}
+circle.recom {
+    stroke: #FFD060;
+}
+circle.recom:hover {
+    fill: #FFD060;
+}
+circle.recom-compared {
+    stroke: #FFDC88;
+}
+circle.recom-compared:hover {
+    fill: #FFDC88;
+}
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script>
+				var margin = {
+					left: 70,
+                    bottom: 40,
+                    right: 60,
+                    top: 30
+				};
+				var width = 500, height = 485, rectStep = 44, rectWidth = 22;
+                var lineData = [
+                    // {
+                    //     "date": "2018-09-02",
+                    //     "compared_date": "2018/08/02",
+                    //     "total_data": 88,//总量
+                    //     "total_data_compared": 77,//总量对比
+                    //     "forward_data": 65,//转发量
+                    //     "forward_data_compared": 55,//转发量对比
+                    //     "recom_data": 34,//内推量
+                    //     "recom_data_compared": 33,//内推量对比
+                    // },
+                    // {
+                    //     "date": "2018-09-03",
+                    //     "compared_date": "2018/08/03",
+                    //     "total_data": 111,//总量
+                    //     "total_data_compared": 100,//总量对比
+                    //     "forward_data": 99,//转发量
+                    //     "forward_data_compared": 88,//转发量对比
+                    //     "recom_data": 78,//内推量
+                    //     "recom_data_compared": 66,//内推量对比
+                    // },
+                    {
+                        "date": "2018-09-01",
+                        "compared_date": "2018/08/02",
+                        "total_data": 45,//总量
+                        "total_data_compared": 77,//总量对比
+                        "forward_data": 45,//转发量
+                        "forward_data_compared": 55,//转发量对比
+                        "recom_data": 22,//内推量
+                        "recom_data_compared": 33,//内推量对比
+                    },
+                    {
+                        "date": "2018-09-02",
+                        "compared_date": "2018/08/02",
+                        "total_data": 88,//总量
+                        "total_data_compared": 77,//总量对比
+                        "forward_data": 65,//转发量
+                        "forward_data_compared": 55,//转发量对比
+                        "recom_data": 34,//内推量
+                        "recom_data_compared": 33,//内推量对比
+                    },
+                    {
+                        "date": "2018-09-03",
+                        "compared_date": "2018/08/03",
+                        "total_data": 110,//总量
+                        "total_data_compared": 100,//总量对比
+                        "forward_data": 99,//转发量
+                        "forward_data_compared": 88,//转发量对比
+                        "recom_data": 78,//内推量
+                        "recom_data_compared": 66,//内推量对比
+                    },
+                    {
+                        "date": "2018-09-04",
+                        "compared_date": "2018/08/01",
+                        "total_data": 55,//总量
+                        "total_data_compared": 90,//总量对比
+                        "forward_data": 55,//转发量
+                        "forward_data_compared": 60,//转发量对比
+                        "recom_data": 40,//内推量
+                        "recom_data_compared": 22,//内推量对比
+                    },
+                ]
+
+                // var xValue = [111, 100, 45];
+				var xValue = ["2018-09-01", "2018-09-02", "2018-09-03", "2018-09-04"];
+				var xValue_compared = ["2018-08-01", "2018-08-02", "2018-08-03"];
+                var yValue = [111, 100, 0];
+                function getYPos(d, i) {
+                    return i * rectStep + margin.top + rectWidth / 2;
+                }
+                var dateFormat = function(d) {
+                    var _date = new Date(d);
+                    // console.log(d, format(_date))
+                    var str = (_date.getMonth() + 1) + "-" + _date.getDate();
+                    return str;
+                }
+				var svg = d3.select('body').append("svg")
+							.attr("class", "bar-graph")
+							.attr("width", width)
+                            .attr("height", height)
+                            .on("mousemove", function(event) {
+                                var mousePos = d3.mouse(svg[0][0]);
+                                //
+                            })
+                            .on("mouseleave", function() {
+                                // console.log(arguments)
+                            });
+				var yScale = d3.scale.linear()
+							.domain([d3.max(yValue), d3.min(yValue)])
+							.rangeRound([margin.top, height - margin.bottom]);
+				var yAxis = d3.svg.axis()
+							.scale(yScale)
+							.orient("left")
+				var xScale = d3.time.scale()
+							.domain([new Date(d3.min(xValue)), new Date(d3.max(xValue))])
+							// .domain([0, new Date(d3.max(xValue))])
+							.rangeRound([0, width - margin.right - margin.left]);
+				var xAxis = d3.svg.axis()
+							.scale(xScale)
+							.orient("bottom").tickPadding(1)
+                            .tickFormat(dateFormat)
+							.ticks(xValue.length)
+                            // .ticks(d3.time.day, 1);
+				svg.append("g")
+					.attr("class", "bar-graph__x-axis")
+					.attr("transform", "translate(" + margin.left + "," + (height - margin.bottom)+ ")")
+					.call(xAxis)
+                    .selectAll("text")
+                    .attr("dy", "1em")
+                    .attr("x", "9");
+                svg.selectAll(".bar-graph__x-axis line")
+                    .attr("y2", height - margin.bottom - margin.top + "")
+                    .attr("transform", "translate(0, " + ((margin.bottom + margin.top) - height) + ")")
+                    .attr("class", "dash-grid")
+                svg.selectAll(".bar-graph__x-axis g")
+                    .on("mouseover", function() {
+                        console.log(arguments)
+                    })
+				svg.append("g")
+					.attr("class", "bar-graph__y-axis")
+					.attr("transform", "translate(" + margin.left + ",0)")
+                    .call(yAxis);
+                svg.selectAll(".bar-graph__y-axis line")
+                    .attr("x2", width - margin.left - margin.right + "")
+                    .attr("class", "dash-grid")
+                    
+                //总量
+                function drawLine(xKey, yKey, klass) {
+                    var lineGen = d3.svg.line()
+                        .x(function(d) {
+                            return xScale(new Date(d[xKey])) + margin.left;
+                        })
+                        .y(function(d) {
+                            return yScale(d[yKey]);
+                        });
+                    svg.append('path')
+                        .attr('d', lineGen(lineData))
+                        .attr("class", "line-" + klass);
+
+                }
+                function drawCircle(xKey, yKey, klass){
+                    var circleUpdate = svg.selectAll("circle." + klass).data(lineData);
+                    // enter处理
+                    circleUpdate.enter().append("circle")
+                            .attr("class", klass)
+                            .attr("r", 5)
+                            .attr("cx", function(d, i){
+                                return margin.left + xScale(new Date(d[xKey]));
+                            })
+                            .attr("cy", function(d, i){
+                                return yScale(d[yKey]);
+                            })
+                            // .on("mouseenter", function(d) {
+                            //     console.log(arguments)
+
+                            //     console.log(d3.mouse())
+                            // })
+                            // .on("mouseleave", function(d) {
+                            //     console.log(arguments)
+                            // });
+                }
+                //总量
+                drawLine('date', 'total_data', 'total');
+                drawCircle('date', 'total_data', 'total');
+                //总量对比
+                drawLine('date', 'total_data_compared', 'total-compared');
+                drawCircle('date', 'total_data_compared', 'total-compared');
+
+                //转发
+                drawLine('date', 'forward_data', 'forward');
+                drawCircle('date', 'forward_data', 'forward');
+                //转发对比
+                drawLine('date', 'forward_data_compared', 'forward-compared');
+                drawCircle('date', 'forward_data_compared', 'forward-compared');
+
+                //内推
+                drawLine('date', 'recom_data', 'recom');
+                drawCircle('date', 'recom_data', 'recom');
+                //内推对比
+                drawLine('date', 'recom_data_compared', 'recom-compared');
+                drawCircle('date', 'recom_data_compared', 'recom-compared');
+                //绘制坐标轴
+                var yPathD = "M0 0"
+                     + " L 0 2"
+                     + " L" + (width - margin.right - margin.left) + " 2"
+                     + " L" + (width - margin.right - margin.left) + " 0"
+                     + " Z";
+                d3.select(".bar-graph__x-axis path").attr("d", yPathD);
+                //todo 柱状图顶部的数字位置
+                // 刻度之间的间隔
+</script>
