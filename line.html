@@ -28,7 +28,7 @@ text.axis-label {
     shape-rendering: crispEdges;
 }
 
-.dash-grid:hover {
+.bar-graph__x-axis .dash-grid:hover {
     stroke: #4B525C;
     stroke-dasharray: 0;
 }
@@ -149,8 +149,8 @@ circle.recom-compared:hover {
                     //     "recom_data_compared": 66,//内推量对比
                     // },
                     {
-                        "date": "2018-09-01",
-                        "compared_date": "2018/08/02",
+                        "date": "2018-09-01 00:00:00",
+                        "compared_date": "2018/08/02 00:00:00",
                         "total_data": 45,//总量
                         "total_data_compared": 77,//总量对比
                         "forward_data": 45,//转发量
@@ -159,8 +159,8 @@ circle.recom-compared:hover {
                         "recom_data_compared": 33,//内推量对比
                     },
                     {
-                        "date": "2018-09-02",
-                        "compared_date": "2018/08/02",
+                        "date": "2018-09-02 00:00:00",
+                        "compared_date": "2018/08/02 00:00:00",
                         "total_data": 88,//总量
                         "total_data_compared": 77,//总量对比
                         "forward_data": 65,//转发量
@@ -169,8 +169,8 @@ circle.recom-compared:hover {
                         "recom_data_compared": 33,//内推量对比
                     },
                     {
-                        "date": "2018-09-03",
-                        "compared_date": "2018/08/03",
+                        "date": "2018-09-03 00:00:00",
+                        "compared_date": "2018/08/03 00:00:00",
                         "total_data": 110,//总量
                         "total_data_compared": 100,//总量对比
                         "forward_data": 99,//转发量
@@ -179,8 +179,8 @@ circle.recom-compared:hover {
                         "recom_data_compared": 66,//内推量对比
                     },
                     {
-                        "date": "2018-09-04",
-                        "compared_date": "2018/08/01",
+                        "date": "2018-09-04 00:00:00",
+                        "compared_date": "2018/08/01 00:00:00",
                         "total_data": 55,//总量
                         "total_data_compared": 90,//总量对比
                         "forward_data": 55,//转发量
@@ -191,9 +191,9 @@ circle.recom-compared:hover {
                 ]
 
                 // var xValue = [111, 100, 45];
-				var xValue = ["2018-09-01", "2018-09-02", "2018-09-03", "2018-09-04"];
+				var xValue = ["2018-09-01 00:00:00", "2018-09-02 00:00:00", "2018-09-03 00:00:00", "2018-09-04 00:00:00"];
 				var xValue_compared = ["2018-08-01", "2018-08-02", "2018-08-03"];
-                var yValue = [111, 100, 0];
+                var yValue = [111, 100, 4];
                 function getYPos(d, i) {
                     return i * rectStep + margin.top + rectWidth / 2;
                 }
@@ -222,29 +222,31 @@ circle.recom-compared:hover {
 							.orient("left")
 				var xScale = d3.time.scale()
 							.domain([new Date(d3.min(xValue)), new Date(d3.max(xValue))])
-							// .domain([0, new Date(d3.max(xValue))])
-							.rangeRound([0, width - margin.right - margin.left]);
+							.rangeRound([margin.left, width - margin.right]);
 				var xAxis = d3.svg.axis()
 							.scale(xScale)
 							.orient("bottom").tickPadding(1)
                             .tickFormat(dateFormat)
 							.ticks(xValue.length)
                             // .ticks(d3.time.day, 1);
+                console.log('dd')
 				svg.append("g")
 					.attr("class", "bar-graph__x-axis")
-					.attr("transform", "translate(" + margin.left + "," + (height - margin.bottom)+ ")")
+					.attr("transform", "translate(0," + (height - margin.bottom)+ ")")
 					.call(xAxis)
-                    .selectAll("text")
-                    .attr("dy", "1em")
-                    .attr("x", "9");
                 svg.selectAll(".bar-graph__x-axis line")
                     .attr("y2", height - margin.bottom - margin.top + "")
                     .attr("transform", "translate(0, " + ((margin.bottom + margin.top) - height) + ")")
                     .attr("class", "dash-grid")
                 svg.selectAll(".bar-graph__x-axis g")
+                    // .attr("transform", function(d) {
+                    //     console.log(d, "translate(" + xScale(d) + ",0)")
+                    //     return "translate(" + xScale(d) + ",0)"
+                    // })
                     .on("mouseover", function() {
                         console.log(arguments)
                     })
+                
 				svg.append("g")
 					.attr("class", "bar-graph__y-axis")
 					.attr("transform", "translate(" + margin.left + ",0)")
@@ -257,7 +259,7 @@ circle.recom-compared:hover {
                 function drawLine(xKey, yKey, klass) {
                     var lineGen = d3.svg.line()
                         .x(function(d) {
-                            return xScale(new Date(d[xKey])) + margin.left;
+                            return xScale(new Date(d[xKey]));
                         })
                         .y(function(d) {
                             return yScale(d[yKey]);
@@ -274,7 +276,7 @@ circle.recom-compared:hover {
                             .attr("class", klass)
                             .attr("r", 5)
                             .attr("cx", function(d, i){
-                                return margin.left + xScale(new Date(d[xKey]));
+                                return xScale(new Date(d[xKey]));
                             })
                             .attr("cy", function(d, i){
                                 return yScale(d[yKey]);
@@ -309,10 +311,10 @@ circle.recom-compared:hover {
                 drawLine('date', 'recom_data_compared', 'recom-compared');
                 drawCircle('date', 'recom_data_compared', 'recom-compared');
                 //绘制坐标轴
-                var yPathD = "M0 0"
-                     + " L 0 2"
-                     + " L" + (width - margin.right - margin.left) + " 2"
-                     + " L" + (width - margin.right - margin.left) + " 0"
+                var yPathD = "M70 0"
+                     + " L 70 2"
+                     + " L" + (width - margin.right) + " 2"
+                     + " L" + (width - margin.right) + " 0"
                      + " Z";
                 d3.select(".bar-graph__x-axis path").attr("d", yPathD);
                 //todo 柱状图顶部的数字位置
