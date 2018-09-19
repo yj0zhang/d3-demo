@@ -42,10 +42,7 @@ text.axis-label {
                     top: 30
 				};
 				var width = 800, height = 500, rectWidth = 30;
-				var xValue = ["浏览人数", "投递数", "查看数", "未查看", "初筛数", "面试数", "不合适", "入职数"];
-                var yValue = [[90, 80], [80, 70], [77, 60], [10, 5], [66, 55], [33, 22], [26,12], [3, 1]];
-                var barLength = xValue.length;
-                function getBarHeight(d) {
+				function getBarHeight(d) {
                     //如果为0，没办法点击，所以设置默认为2
                     var yBarHeight = yScale(d);
                     return height - (yBarHeight + margin.bottom);
@@ -54,21 +51,52 @@ text.axis-label {
 							.attr("class", "bar-graph")
 							.attr("width", width)
                             .attr("height", height);
-				var xScale = d3.scale.ordinal()
-							.domain(xValue)
-							.rangeRoundBands([margin.left, width - margin.right]);
+				var xScale0 = d3.scale.ordinal()
+							.rangeRoundBands([margin.left, width - margin.right],.1);
+                var xScale1 = d3.scale.ordinal();
 				var xAxis = d3.svg.axis()
-							.scale(xScale)
-							.orient("bottom")
-							.ticks(barLength);
+							.scale(xScale0)
+							.orient("bottom");
 				var yScale = d3.scale.linear()
-							.domain([0, d3.max(yValue)])
                             .range([height - margin.bottom, margin.top]);
+                            // .range([height, 0])
                 window.yScale = yScale
 				var yAxis = d3.svg.axis()
 							.scale(yScale)
-							.orient("left")
+							.orient("left").tickFormat(d3.format(".2s"));
 							// .ticks(barLength);
+                var color = d3.scale.ordinal()
+                    .range(['#66A4F9', '#E1EDFE']);
+                var dataset = [
+                    {
+                        label: "eww",
+                        a: 100,
+                        b: 22
+                    },
+                    {
+                        label: "ewrew",
+                        a: 10,
+                        b: 10
+                    },
+                ]
+
+                //获取label
+                var options = d3.keys(dataset[0]).filter(function(key) { return key !== "label"; });
+                
+                dataset.forEach(function(d) {
+                    d.valores = options.map(function(name) { return {name: name, value: +d[name]}; });
+                });
+                console.log(dataset)
+
+                xScale0.domain(dataset.map(function(d) { return d.label; }));
+                xScale1.domain(options).rangeRoundBands([0, xScale0.rangeBand()]);
+                yScale.domain([0, d3.max(dataset, function(d) { return d3.max(d.valores, function(d) { return d.value; }); })]);
+                console.log("maxY", d3.max(dataset, function(d) { return d3.max(d.valores, function(d) { return d.value; }); }))
+
+window.xScale0 = xScale0
+window.xScale1 = xScale1
+
+
 				svg.append("g")
 					.attr("class", "bar-graph__x-axis")
 					.attr("transform", "translate(0," + (height - margin.bottom)+ ")")
@@ -84,73 +112,23 @@ text.axis-label {
                 svg.selectAll(".bar-graph__y-axis line")
                     .attr("x2", width - margin.left - margin.right + "")
                     .attr("class", "dash-grid")
-
-
-// g.append("g")
-//     .selectAll("g")
-//     .data(data)
-//     .enter().append("g")
-//       .attr("transform", function(d) { return "translate(" + x0(d.State) + ",0)"; })
-//     .selectAll("rect")
-//     .data(function(d) { return keys.map(function(key) { return {key: key, value: d[key]}; }); })
-//     .enter().append("rect")
-//       .attr("x", function(d) { return x1(d.key); })
-//       .attr("y", function(d) { return y(d.value); })
-//       .attr("width", x1.bandwidth())
-//       .attr("height", function(d) { return height - y(d.value); })
-//       .attr("fill", function(d) { return z(d.key); });
-
-                var bars = svg.selectAll("bar")
-                    .data(yValue)
-                    .enter()  //获取enter部分
-                    .append("g")
-                    .attr("class", "bar")
-                    .selectAll("rect")
-                    .data(function(d) {
-                        console.log(d)
-                    })
+                var bar = svg.selectAll(".bar")
+                    .data(dataset)
+                    .enter().append("g")
+                    .attr("class", "rect")
+                    .attr("transform", function(d) { return "translate(" + xScale0(d.label) + ",0)"; });
+    
+                bar.selectAll("rect")
+                    .data(function(d) { return d.valores; })
                     .enter().append("rect")
-                    .attr("x",function(d,i){  //设置X坐标
-                        console.log(xScale(xValue[i]))
-                        return xScale(xValue[i]) + (width/4) / xValue.length;
-                        // return xScale(xValue[i]) + rectWidth / 2
-                    })
-                    .attr("y",function(d,i){  //设置Y坐标
-                        return yScale(d)
-                    })
-                    .attr("width", rectWidth)  //设置矩形宽度，之前定义的
-                    .attr("height",function(d){   //设置矩形高度，即为数组中的各项值
-                        return getBarHeight(d);
-                    });
-                // bars.append("rect")//添加rect元素，使其与绑定数组的长度一致
-                //     // .attr("fill","#66A4F9")
-                //     .attr("x",function(d,i){  //设置X坐标
-                //         console.log(xScale(xValue[i]))
-                //         return xScale(xValue[i]) + (width/4) / xValue.length;
-                //         // return xScale(xValue[i]) + rectWidth / 2
-                //     })
-                //     .attr("y",function(d,i){  //设置Y坐标
-                //         return yScale(d)
-                //     })
-                //     .attr("width", rectWidth)  //设置矩形宽度，之前定义的
-                //     .attr("height",function(d){   //设置矩形高度，即为数组中的各项值
-                //         return getBarHeight(d);
-                //     })
-                //     .on("click", function(d, i) {
-                //         console.log(d,i)
-                //     });
-                // bars.append("text")
-                //     .attr("class", "axis-label")
-                //     .text(function(d) {
-                //         return d;
-                //     })
-                //     .attr("x", function(d, i) {
-                //         return xScale(xValue[i]) + rectWidth - 5;
-                //         //fix 5不正确，需要偏移text宽度的一半
-                //     })
-                //     .attr("y", function(d) {
-                //         return yScale(d) - 10
-                //     })
+                    .attr("width", xScale1.rangeBand())
+                    // .attr("width", rectWidth)
+                    .attr("x", function(d) { return xScale1(d.name); })
+                    .attr("y", function(d) { return yScale(d.value); })
+                    .attr("value", function(d){return d.name;})
+                    .attr("height", function(d) { return getBarHeight(d.value); })
+                    .style("fill", function(d) { return color(d.name); });
+ 
                 var xPathD = "M" + margin.left + " 0" + 
                     " L" + margin.left + " 2" + 
                     " L" + (width - margin.right) + " 2" + 
