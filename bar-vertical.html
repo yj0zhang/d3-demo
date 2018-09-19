@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+svg {
+    border: 1px solid;
+    color: #4b525c;
+    font-size: 14px;
+}
+path {
+    fill: #4b525c;
+}
+rect {
+    fill: #66A4F9;
+}
+text.axis-label {
+    fill: #66A4F9;
+    transform: translateY(5px);
+}
+.bar-graph__y-axis path {
+    stroke: #fff;
+    fill: none;
+}
+.bar {
+    cursor: pointer;
+}
+.dash-grid {
+    stroke: #d5d5d5;
+    stroke-dasharray: 3;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script>
+				var margin = {
+					left: 70,
+                    bottom: 40,
+                    right: 60,
+                    top: 30
+				};
+				var width = 800, height = 500, rectWidth = 30;
+				var xValue = ["浏览人数", "投递数", "查看数", "未查看", "初筛数", "面试数", "不合适", "入职数"];
+                var yValue = [90, 80, 77, 10, 66, 33, 26, 3];
+                // var yValue = [[90, 80], [80, 70], [77, 60], [10, 5], [66, 55], [33, 22], [26,12], [3, 1]];
+                var barLength = xValue.length;
+                function getBarHeight(d) {
+                    //如果为0，没办法点击，所以设置默认为2
+                    var yBarHeight = yScale(d);
+                    return height - (yBarHeight + margin.bottom);
+                }
+				var svg = d3.select('body').append("svg")
+							.attr("class", "bar-graph")
+							.attr("width", width)
+                            .attr("height", height);
+				var xScale = d3.scale.ordinal()
+							.domain(xValue)
+							.rangeRoundBands([margin.left, width - margin.right]);
+				var xAxis = d3.svg.axis()
+							.scale(xScale)
+							.orient("bottom")
+							.ticks(barLength);
+				var yScale = d3.scale.linear()
+							.domain([0, d3.max(yValue)])
+                            .range([height - margin.bottom, margin.top]);
+                window.yScale = yScale
+				var yAxis = d3.svg.axis()
+							.scale(yScale)
+							.orient("left")
+							// .ticks(barLength);
+				svg.append("g")
+					.attr("class", "bar-graph__x-axis")
+					.attr("transform", "translate(0," + (height - margin.bottom)+ ")")
+					.call(xAxis)
+                svg.selectAll(".bar-graph__x-axis line")
+                    .attr("y2", height - margin.bottom - margin.top + "")
+                    .attr("transform", "translate(0, " + ((margin.bottom + margin.top) - height) + ")")
+                    .attr("class", "dash-grid")
+				svg.append("g")
+					.attr("class", "bar-graph__y-axis")
+					.attr("transform", "translate(" + margin.left + ",0)")
+                    .call(yAxis);
+                svg.selectAll(".bar-graph__y-axis line")
+                    .attr("x2", width - margin.left - margin.right + "")
+                    .attr("class", "dash-grid")
+                    
+                var bars = svg.selectAll("bar")
+                    .data(yValue)
+                    .enter()  //获取enter部分
+                    .append("g")
+                    .attr("class", "bar");
+                bars.append("rect")//添加rect元素，使其与绑定数组的长度一致
+                    // .attr("fill","#66A4F9")
+                    .attr("x",function(d,i){  //设置X坐标
+                        console.log(xScale(xValue[i]))
+                        return xScale(xValue[i]) + (width/4) / xValue.length;
+                        // return xScale(xValue[i]) + rectWidth / 2
+                    })
+                    .attr("y",function(d,i){  //设置Y坐标
+                        return yScale(d)
+                    })
+                    .attr("width", rectWidth)  //设置矩形宽度，之前定义的
+                    .attr("height",function(d){   //设置矩形高度，即为数组中的各项值
+                        return getBarHeight(d);
+                    })
+                    .on("click", function(d, i) {
+                        console.log(d,i)
+                    });
+                // bars.append("text")
+                //     .attr("class", "axis-label")
+                //     .text(function(d) {
+                //         return d;
+                //     })
+                //     .attr("x", function(d, i) {
+                //         return xScale(xValue[i]) + rectWidth - 5;
+                //         //fix 5不正确，需要偏移text宽度的一半
+                //     })
+                //     .attr("y", function(d) {
+                //         return yScale(d) - 10
+                //     })
+                var xPathD = "M" + margin.left + " 0" + 
+                    " L" + margin.left + " 2" + 
+                    " L" + (width - margin.right) + " 2" + 
+                    " L" + (width - margin.right) + " 0" + " Z";
+                d3.select(".bar-graph__x-axis path").attr("d", xPathD);
+                //todo 柱状图顶部的数字位置
+                // 刻度之间的间隔
+</script>

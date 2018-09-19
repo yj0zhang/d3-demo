@@ -31,7 +31,7 @@ text.axis-label {
     shape-rendering: crispEdges;
 }
 .bar-graph__x-axis text {
-    /* transform: rotate(30deg) */
+    transform: rotate(30deg)
 }
 </style>
 <body>
@@ -52,9 +52,9 @@ text.axis-label {
                 function getBarWidth(d) {
                     //如果为0，没办法点击，所以设置默认为2
                     var xBarWidth = xScale(d);
-                    // if(xBarWidth < 2) {
-                    //     xBarWidth = 2;
-                    // }
+                    if(xBarWidth < 2) {
+                        xBarWidth = 2;
+                    }
                     return xBarWidth;
                 }
                 function getYPos(d, i) {
@@ -73,11 +73,10 @@ text.axis-label {
 							.ticks(barLength);
 				var xScale = d3.scale.linear()
 							.domain([0, d3.max(xValue)])
-                            .rangeRound([0, width - margin.right - margin.left]);
-                window.xScale = xScale;
+							.rangeRound([0, width - margin.right - margin.left]);
 				var xAxis = d3.svg.axis()
 							.scale(xScale)
-							.orient("bottom")
+							.orient("bottom").tickPadding(1)
 							// .ticks(barLength);
 				svg.append("g")
 					.attr("class", "bar-graph__x-axis")
@@ -124,7 +123,7 @@ text.axis-label {
                         return d;
                     })
                     .attr("x", function(d) {
-                        return getBarWidth(d) +  + margin.left + 2;
+                        return getBarWidth(d) + margin.left + 2;
                     })
                     .attr("y", function(d, i) {
                         return getYPos(d, i) + rectWidth / 2;
