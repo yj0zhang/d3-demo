@@ -147,7 +147,7 @@ rect {
         .enter().append("g")
         .attr("height", yScale1.rangeBand())
         .attr("transform", function(d) { return "translate(" + margin.left + "," + yScale1(d.name) + ")" })
-    var n = 0;
+        
     stackBar.selectAll("rect")
         .data(function(d){ return d.value; })
         .enter().append("rect")
