@@ -54,6 +54,7 @@ body {
     var color = d3.scale.ordinal()
         .range(["#FFBF25", "#2CD6B1", "#66A4F9"]);
     
+        window.color = color
     var xAxis = d3.svg.axis()
         .scale(x)
         .orient("bottom");
@@ -113,25 +114,25 @@ body {
         .attr("height", function(d) { return y(d.y0) - y(d.y1); })
         .style("fill", function(d) { return color(d.name); });
     
-    var legend = svg.selectAll(".legend")
-        .data(color.domain().slice().reverse())
-        .enter().append("g")
-        .attr("class", "legend")
-        .style("font-color",'white')
-        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+    // var legend = svg.selectAll(".legend")
+    //     .data(color.domain().slice().reverse())
+    //     .enter().append("g")
+    //     .attr("class", "legend")
+    //     .style("font-color",'white')
+    //     .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
     
-    legend.append("rect")
-        .attr("x", width - 18)
-        .attr("width", 18)
-        .attr("height", 18)
-        .style("fill", color);
+    // legend.append("rect")
+    //     .attr("x", width - 18)
+    //     .attr("width", 18)
+    //     .attr("height", 18)
+    //     .style("fill", color);
     
-    legend.append("text")
-        .attr("x", width - 24)
-        .attr("y", 9)
-        .attr("dy", "0.35em")
-        .style("text-anchor", "end")
-        .text(function(d) { return d; });
+    // legend.append("text")
+    //     .attr("x", width - 24)
+    //     .attr("y", 9)
+    //     .attr("dy", "0.35em")
+    //     .style("text-anchor", "end")
+    //     .text(function(d) { return d; });
     
     });
     </script>

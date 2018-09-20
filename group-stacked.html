@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+svg {
+    border: 1px solid;
+    color: #4b525c;
+    font-size: 14px;
+}
+path {
+    fill: #4b525c;
+}
+rect {
+    fill: #66A4F9;
+}
+/* text.axis-label {
+    fill: #fff;
+    transform: translateY(5px);
+} */
+.bar-graph__x-axis path {
+    stroke: #fff;
+    fill: none;
+}
+.bar {
+    cursor: pointer;
+}
+.dash-grid {
+    stroke: #d5d5d5;
+    stroke-dasharray: 3;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script>
+    var margin = {
+        left: 70,
+        bottom: 40,
+        right: 60,
+        top: 30
+    };
+    var width = 800, height = 500, rectWidth = 30;
+    var svg = d3.select('body').append("svg")
+                .attr("class", "bar-graph")
+                .attr("width", width)
+                .attr("height", height);
+    var yScale0 = d3.scale.ordinal()
+                .rangeRoundBands([height - margin.bottom, margin.top],.1);
+    var yScale1 = d3.scale.ordinal();
+    var yAxis = d3.svg.axis()
+                .scale(yScale0)
+                .orient("left")
+                .tickSize(2,2);
+    var xScale = d3.scale.linear()
+                .rangeRound([margin.left, width - margin.right],.1);
+    var xAxis = d3.svg.axis()
+                .scale(xScale)
+                .orient("bottom").tickFormat(d3.format(".2s"))
+                .tickSize(2, 2);
+    var color = d3.scale.ordinal()
+        .range(["#FFBF25", "#2CD6B1", "#66A4F9", "#FFF6E0", "#D5F7EF", "#E1EDFE"]);
+    var colorText = d3.scale.ordinal()
+        .range(["#fff", "#fff", "#fff", "#FFBF25", "#2CD6B1", "#66A4F9"]);
+    var dataset = [
+        {
+            label: "eww",
+            a: {
+                forward: 44,
+                recom: 20,
+                total: 64
+            },
+            b: {
+                forward: 34,
+                recom: 22,
+                total: 56
+            }
+        },
+        {
+            label: "ewrew",
+            a: {
+                forward: 54,
+                recom: 44,
+                total: 98
+            },
+            b: {
+                forward: 22,
+                recom: 3,
+                total: 25
+            }
+        },
+    ]
+
+    
+    //获取label
+    var options = d3.keys(dataset[0]).filter(function(key) { return key !== "label"; });
+    var optionStackeds = ["total", "forward", "recom"];
+    
+    dataset.forEach(function(d) {
+        d.valores = options.map(function(name) {
+            var y0 = 0;
+            var value = optionStackeds.map(stackName => {
+                return {
+                    name: name + "-" + stackName,
+                    value: d[name][stackName] || 0,
+                    y0: y0,
+                    y1: y0 += +d[name][stackName] || 0
+                }
+            })
+            var temp = {
+                name: name,
+                value: value
+            }
+            return temp;
+        });
+    });
+    console.log(dataset)
+
+    yScale0.domain(dataset.map(function(d) { return d.label; }));
+    yScale1.domain(options).rangeRoundBands([0, yScale0.rangeBand()]);
+    xScale.domain([0, d3.max(dataset, function(d) { return d3.max(d.valores, function(d) { return d3.max(d.value, function(d) { return d.value }); }); })]);
+
+    svg.append("g")
+        .attr("class", "bar-graph__x-axis")
+        .attr("transform", "translate(0," + (height - margin.bottom)+ ")")
+        .call(xAxis)
+    svg.selectAll(".bar-graph__x-axis line")
+        .attr("y2", height - margin.bottom - margin.top + "")
+        .attr("transform", "translate(0, " + ((margin.bottom + margin.top) - height) + ")")
+        .attr("class", "dash-grid")
+    svg.append("g")
+        .attr("class", "bar-graph__y-axis")
+        .attr("transform", "translate(" + margin.left + ",0)")
+        .call(yAxis);
+    svg.selectAll(".bar-graph__y-axis line")
+        .attr("x2", width - margin.left - margin.right + "")
+        .attr("class", "dash-grid")
+    var barGroup = svg.selectAll(".bar")
+        .data(dataset)
+        .enter().append("g")
+        .attr("class", "bar")
+        .attr("transform", function(d) { return "translate(0, " + yScale0(d.label) + ")"; });
+
+    var stackBar = barGroup.selectAll("g")
+        .data(function(d) { return d.valores; })
+        .enter().append("g")
+        .attr("height", yScale1.rangeBand())
+        .attr("transform", function(d) { return "translate(" + margin.left + "," + yScale1(d.name) + ")" })
+    var n = 0;
+    stackBar.selectAll("rect")
+        .data(function(d){ return d.value; })
+        .enter().append("rect")
+        .attr("height", yScale1.rangeBand())
+        .attr("width", function(d) { return xScale(d.y1) - xScale(d.y0); })
+        .style("fill", function(d) {
+            console.log(d.name)
+            return color(d.name);
+        });
+
+    stackBar.selectAll("text")
+        .data(function(d) { return d.value; })
+        .enter()
+        .append("text")
+        .attr("class", "axis-label")
+        .style("fill", function(d) {
+            return colorText(d.name)
+        })
+        .text(function(d) {
+            return d.value;
+        })
+        .attr("x", function(d) {
+            return xScale(d.y1) - xScale(d.y0) - 20;
+        })
+        .attr("y", function(d) {
+            return yScale1.rangeBand()/2;
+        });
+
+</script>
