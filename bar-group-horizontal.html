@@ -17,7 +17,7 @@ text.axis-label {
     fill: #66A4F9;
     transform: translateY(5px);
 }
-.bar-graph__y-axis path {
+.bar-graph__x-axis path {
     stroke: #fff;
     fill: none;
 }
@@ -42,29 +42,29 @@ text.axis-label {
         top: 30
     };
     var width = 800, height = 500, rectWidth = 30;
-    function getBarHeight(d) {
-        //如果为0，没办法点击，所以设置默认为2
-        var yBarHeight = yScale(d);
-        return height - (yBarHeight + margin.bottom);
+    function getBarWidth(d) {
+        return xScale(d) - margin.left;
     }
     var svg = d3.select('body').append("svg")
                 .attr("class", "bar-graph")
                 .attr("width", width)
                 .attr("height", height);
-    var xScale0 = d3.scale.ordinal()
-                .rangeRoundBands([margin.left, width - margin.right],.1);
-    var xScale1 = d3.scale.ordinal();
-    var xAxis = d3.svg.axis()
-                .scale(xScale0)
-                .orient("bottom")
-                .tickSize(2, 2);
-    var yScale = d3.scale.linear()
-                .range([height - margin.bottom, margin.top]);
-                // .range([height, 0])
-    window.yScale = yScale
+    var yScale0 = d3.scale.ordinal()
+                .rangeRoundBands([height - margin.bottom, margin.top],.1);
+    var yScale1 = d3.scale.ordinal();
     var yAxis = d3.svg.axis()
-                .scale(yScale)
-                .orient("left").tickFormat(d3.format(".2s"))
+                .scale(yScale0)
+                .orient("left")
+                .tickSize(2,2);
+    var xScale = d3.scale.linear()
+                .rangeRound([margin.left, width - margin.right],.1);
+                // .range([height, 0])
+    window.xScale = xScale
+    window.yScale1 = yScale1
+    window.yScale0 = yScale0
+    var xAxis = d3.svg.axis()
+                .scale(xScale)
+                .orient("bottom").tickFormat(d3.format(".2s"))
                 .tickSize(2, 2);
                 // .ticks(barLength);
     var color = d3.scale.ordinal()
@@ -90,9 +90,9 @@ text.axis-label {
     });
     console.log(dataset)
 
-    xScale0.domain(dataset.map(function(d) { return d.label; }));
-    xScale1.domain(options).rangeRoundBands([0, xScale0.rangeBand()]);
-    yScale.domain([0, d3.max(dataset, function(d) { return d3.max(d.valores, function(d) { return d.value; }); })]);
+    yScale0.domain(dataset.map(function(d) { return d.label; }));
+    yScale1.domain(options).rangeRoundBands([0, yScale0.rangeBand()]);
+    xScale.domain([0, d3.max(dataset, function(d) { return d3.max(d.valores, function(d) { return d.value; }); })]);
     console.log("maxY", d3.max(dataset, function(d) { return d3.max(d.valores, function(d) { return d.value; }); }))
 
 
@@ -115,19 +115,17 @@ text.axis-label {
         .data(dataset)
         .enter().append("g")
         .attr("class", "bar")
-        .attr("transform", function(d) { return "translate(" + xScale0(d.label) + ",0)"; });
+        .attr("transform", function(d) { return "translate(0, " + yScale0(d.label) + ")"; });
 
     bar.selectAll("rect")
         .data(function(d) { return d.valores; })
         .enter().append("rect")
-        .attr("width", xScale1.rangeBand())
-        // .attr("width", rectWidth)
-        .attr("x", function(d) { return xScale1(d.name); })
-        .attr("y", function(d) { return yScale(d.value); })
+        .attr("height", yScale1.rangeBand())
+        .attr("y", function(d) { return yScale1(d.name); })
+        .attr("x", function(d) { return margin.left; })
         .attr("value", function(d){return d.name;})
-        .attr("height", function(d) { return getBarHeight(d.value); })
+        .attr("width", function(d) { return getBarWidth(d.value); })
         .style("fill", function(d) { return color(d.name); });
-
     bar.selectAll("text")
         .data(function(d) { console.log(d.valores); return d.valores; })
         .enter()
@@ -137,9 +135,10 @@ text.axis-label {
             return d.value;
         })
         .attr("x", function(d) {
-            return xScale1(d.name) + xScale1.rangeBand()/2;
+            return getBarWidth(d.value) + margin.left + 2;
         })
         .attr("y", function(d) {
-            return height - margin.bottom - getBarHeight(d.value) - 10
+            return yScale1(d.name) + yScale1.rangeBand()/2;
         });
+
 </script>
