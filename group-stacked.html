@@ -13,10 +13,9 @@ path {
 rect {
     fill: #66A4F9;
 }
-/* text.axis-label {
-    fill: #fff;
-    transform: translateY(5px);
-} */
+text.axis-label {
+    text-anchor: end;
+}
 .bar-graph__x-axis path {
     stroke: #fff;
     fill: none;
@@ -170,7 +169,7 @@ rect {
             return d.value;
         })
         .attr("x", function(d) {
-            return xScale(d.y1) - xScale(d.y0) - 20;
+            return xScale(d.y1) - xScale(d.y0);
         })
         .attr("y", function(d) {
             return yScale1.rangeBand()/2;
